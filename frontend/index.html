@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Suduelku — Classic Minimalist 1v1 Sudoku</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body class="h-screen overflow-hidden flex flex-col justify-center bg-[#faf7f0] text-[#1c1917]">
+
+  <!-- MAIN CONTAINER -->
+  <main class="w-full max-w-5xl mx-auto px-3 sm:px-5 py-1.5 max-h-screen flex flex-col justify-center">
+
+    <!-- MÀN HÌNH 1: TRANG CHỦ MINIMALIST CLASSIC / VINTAGE                  -->
+    <section id="viewHome" class="w-full">
+      <div class="relative bg-[#fffdf9] rounded-none sm:rounded-md border-2 border-[#292524] p-6 sm:p-8 shadow-sm min-h-[520px] max-h-[calc(100vh-1.5rem)] flex flex-col justify-between overflow-hidden">
+
+        <!-- GÓC TRÊN PHẢI: Cụm nút Đăng nhập / Đăng ký / Đăng xuất -->
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-[#e7e2d8] pb-3 pl-12 sm:pl-14">
+          <div class="text-xs italic text-[#57534e]">
+            Sudoku đối kháng 1v1
+          </div>
+
+          <div class="flex items-center gap-2">
+            <!-- Khi CHƯA đăng nhập -->
+            <div id="homeGuestActions" class="flex flex-wrap items-center gap-2">
+              <span class="hidden sm:inline text-xs italic text-[#78716c]">Chế độ Khách</span>
+              <button id="btnHomeOpenLogin" type="button" class="px-3.5 py-1 border border-[#292524] bg-[#292524] text-[#fffdf9] hover:bg-[#44403c] text-xs font-semibold tracking-wide transition">
+                Đăng nhập
+              </button>
+              <button id="btnHomeOpenRegister" type="button" class="px-3.5 py-1 border border-[#292524] bg-transparent hover:bg-[#f3efe6] text-[#1c1917] text-xs font-semibold tracking-wide transition">
+                Đăng ký
+              </button>
+            </div>
+
+            <!-- Khi ĐÃ đăng nhập -->
+            <div id="homeLoggedActions" class="hidden flex flex-wrap items-center gap-2">
+              <div class="px-2.5 py-0.5 border border-[#d6d0c4] bg-[#f5f2eb] text-xs">
+                <span id="currentUsernameLabel" class="font-bold text-[#1c1917]">minh_sudoku</span>
+                <span class="mx-1 text-[#a8a29e]">•</span>
+                <span id="currentEloLabel" class="mono-num text-xs font-bold text-[#2d6a4f]">1200 ELO</span>
+              </div>
+              <button id="btnHomeLogout" type="button" class="px-3 py-1 border border-[#b91c1c] text-[#b91c1c] hover:bg-[#b91c1c] hover:text-white text-xs font-semibold transition">
+                Đăng xuất
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CỘT DỌC SÁT BIÊN TRÁI -->
+        <aside class="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 flex flex-col gap-3 z-30" aria-label="Menu tiện ích">
+          <button id="btnOpenTechInfoModal" type="button" class="left-rail-btn" aria-label="Thông tin công nghệ">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span class="left-rail-tooltip">Thông tin công nghệ</span>
+          </button>
+
+          <button id="btnOpenRulesModal" type="button" class="left-rail-btn" aria-label="Luật chơi & Phím tắt">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+            <span class="left-rail-tooltip">Luật chơi &amp; Phím tắt</span>
+          </button>
+
+          <button id="btnOpenLeaderboardModal" type="button" class="left-rail-btn" aria-label="Bảng xếp hạng">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+              <path d="M4 22h16"></path>
+              <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+              <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+              <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+            </svg>
+            <span class="left-rail-tooltip">Bảng xếp hạng ELO</span>
+          </button>
+
+          <button id="btnOpenHistoryModal" type="button" class="left-rail-btn opacity-50 cursor-not-allowed" disabled aria-label="Lịch sử đấu">
+            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+              <path d="M3 3v5h5"></path>
+              <path d="M12 7v5l4 2"></path>
+            </svg>
+            <span class="left-rail-tooltip">Lịch sử trận đấu</span>
+          </button>
+        </aside>
+
+        <!-- TRUNG TÂM TRANG CHỦ -->
+        <div class="max-w-sm w-full mx-auto flex flex-col items-center text-center my-auto py-4 pl-10 sm:pl-0 space-y-4">
+          <div class="space-y-1">
+            <h1 class="vintage-title text-5xl sm:text-6xl font-bold text-[#1c1917] tracking-normal select-none">
+              Suduelku
+            </h1>
+            <div class="w-16 h-[1.5px] bg-[#292524] mx-auto"></div>
+          </div>
+
+          <div class="w-full space-y-2.5 pt-1">
+            <!-- 1. Ghép cặp nhanh (Khóa khi chưa đăng nhập) -->
+            <button id="btnQuickMatchCenter" type="button" disabled
+              class="w-full py-3 px-6 border-2 border-[#292524] bg-[#292524] hover:bg-[#3f3a36] text-[#fffdf9] text-base font-semibold tracking-wide transition shadow-sm flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">
+              <span>Ghép trận nhanh</span>
+            </button>
+
+            <!-- 2. Tạo phòng (Khóa khi chưa đăng nhập) -->
+            <button id="btnHomeCreateRoom" type="button" disabled
+              class="w-full py-3 px-6 border-2 border-[#292524] bg-[#2d6a4f] hover:bg-[#23533d] text-[#fffdf9] text-base font-semibold tracking-wide transition shadow-sm flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">
+              <span>Tạo phòng</span>
+            </button>
+
+            <!-- 3. Nhập mã phòng (Khóa khi chưa đăng nhập) -->
+            <div class="w-full space-y-1.5">
+              <button id="btnToggleRoomInput" type="button" disabled
+                class="w-full py-3 px-6 border-2 border-[#292524] bg-[#fffdf9] hover:bg-[#f3efe6] text-[#1c1917] text-base font-semibold tracking-wide transition shadow-sm flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">
+                <span>Nhập mã phòng</span>
+              </button>
+
+              <div id="roomInputCollapse" class="hidden pt-1">
+                <div class="flex items-stretch border-2 border-[#292524] bg-white">
+                  <input id="inputRoomCode" type="text" maxlength="4" placeholder="MÃ 4 KÝ TỰ (VD: S9K2)"
+                    class="flex-1 px-3 py-2 text-xs sm:text-sm font-bold text-[#1c1917] placeholder-[#a8a29e] uppercase tracking-widest mono-num focus:outline-none" />
+                  <button id="btnJoinRoom" type="button" class="px-5 bg-[#292524] hover:bg-[#44403c] text-[#fffdf9] text-xs font-bold uppercase tracking-wider transition">
+                    Vào
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. Đấu với máy (Luôn mở) -->
+            <button id="btnHomeVsBot" type="button"
+              class="w-full py-3 px-6 border-2 border-[#292524] bg-[#2b4c7e] hover:bg-[#203a61] text-[#fffdf9] text-base font-semibold tracking-wide transition shadow-sm">
+              Đấu với máy
+            </button>
+          </div>
+
+          <!-- Khung Chọn Độ Khó (Chỉ dành cho Đấu với máy tại Trang chủ) -->
+          <div id="homeDifficultyPicker" class="hidden w-full pt-1">
+            <div class="bg-[#f5f2eb] border-2 border-[#292524] p-3.5 text-left space-y-2.5">
+              <div class="flex items-center justify-between border-b border-[#d6d0c4] pb-1">
+                <span id="pickerModeBadge" class="text-xs font-bold uppercase tracking-wider text-[#1c1917]">
+                  Chế độ: Đấu với máy (Bot AI)
+                </span>
+                <button id="btnCancelDifficultyPicker" type="button" class="text-xs font-bold text-[#57534e] hover:text-[#1c1917]">✕ Đóng</button>
+              </div>
+              <div class="text-xs italic text-[#57534e]">Chọn cấp độ khó để bắt đầu:</div>
+              <div class="grid grid-cols-3 gap-2">
+                <button id="diffEasyBtn" type="button" data-diff="EASY"
+                  class="diff-btn py-2 px-2 border border-[#292524] bg-[#fffdf9] hover:bg-[#292524] hover:text-[#fffdf9] text-center transition">
+                  <div class="text-sm font-bold">Dễ</div>
+                  <div class="text-[10px] mono-num opacity-75">40 số sẵn</div>
+                </button>
+                <button id="diffMediumBtn" type="button" data-diff="MEDIUM"
+                  class="diff-btn py-2 px-2 border border-[#292524] bg-[#fffdf9] hover:bg-[#292524] hover:text-[#fffdf9] text-center transition">
+                  <div class="text-sm font-bold">Trung bình</div>
+                  <div class="text-[10px] mono-num opacity-75">30 số sẵn</div>
+                </button>
+                <button id="diffHardBtn" type="button" data-diff="HARD"
+                  class="diff-btn py-2 px-2 border border-[#292524] bg-[#fffdf9] hover:bg-[#292524] hover:text-[#fffdf9] text-center transition">
+                  <div class="text-sm font-bold">Khó</div>
+                  <div class="text-[10px] mono-num opacity-75">25 số sẵn</div>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHÂN TRANG MINIMALIST -->
+        <div class="border-t border-[#e7e2d8] pt-2.5 pl-12 sm:pl-14 flex items-center justify-between text-xs text-[#78716c] italic">
+          <span>Suduelku Classic Edition - PvP</span>
+          <span>Nhấn biểu tượng (?) bên trái để xem Luật chơi &amp; Phím tắt</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- MÀN HÌNH 2: PHÒNG CHỜ (WAITING ROOM LOBBY CHO TẠO PHÒNG & NHẬP MÃ) -->
+    <section id="viewRoomLobby" class="hidden w-full">
+      <div class="bg-[#fffdf9] border-2 border-[#292524] p-4 sm:p-5 shadow-sm max-w-3xl mx-auto space-y-3.5 max-h-[calc(100vh-1.5rem)] overflow-hidden">
+
+        <!-- Header Phòng chờ: Mã phòng + Nút Copy + Rời phòng -->
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b-2 border-[#292524] pb-2.5">
+          <div class="flex items-center gap-2.5">
+            <span class="text-xs uppercase tracking-widest text-[#57534e] font-bold">PHÒNG CHỜ:</span>
+            <span id="lobbyRoomCodeDisplay" class="px-3 py-0.5 bg-[#292524] text-[#fffdf9] text-lg font-bold mono-num tracking-widest">S9K2</span>
+            <button id="btnCopyRoomCode" type="button"
+              class="px-2.5 py-1 border border-[#292524] bg-[#f5f2eb] hover:bg-[#e7e2d8] text-xs font-bold transition">
+              Sao chép mã phòng
+            </button>
+          </div>
+          <button id="btnLeaveRoomLobby" type="button"
+            class="px-3.5 py-1 border border-[#b91c1c] text-[#b91c1c] hover:bg-[#b91c1c] hover:text-white text-xs font-bold transition">
+            Rời phòng chờ
+          </button>
+        </div>
+
+        <!-- 2 Thẻ Người chơi (Chủ phòng vs Khách) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <!-- Chủ phòng -->
+          <div class="p-3 border-2 border-[#292524] bg-[#f5f2eb] space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase text-[#2d6a4f]">CHỦ PHÒNG (HOST)</span>
+              <span id="lobbyHostReadyBadge" class="px-2 py-0.5 bg-[#16a34a] text-white text-[10px] font-bold">ĐÃ SẴN SÀNG</span>
+            </div>
+            <div id="lobbyHostName" class="text-base font-bold text-[#1c1917]">minh_sudoku</div>
+            <div id="lobbyHostElo" class="text-[11px] mono-num text-[#57534e]">1200 ELO • Chủ phòng điều chỉnh độ khó</div>
+          </div>
+
+          <!-- Khách -->
+          <div class="p-3 border-2 border-[#292524] bg-[#f5f2eb] space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-bold uppercase text-[#2b4c7e]">ĐỐI THỦ CÙNG PHÒNG</span>
+              <span id="lobbyGuestReadyBadge" class="px-2 py-0.5 bg-[#16a34a] text-white text-[10px] font-bold">ĐÃ SẴN SÀNG</span>
+            </div>
+            <div id="lobbyGuestName" class="text-base font-bold text-[#1c1917]">lan_logic (Online)</div>
+            <div id="lobbyGuestElo" class="text-[11px] mono-num text-[#57534e]">1200 ELO • Kết nối ổn định</div>
+          </div>
+        </div>
+
+        <!-- Khu vực Chọn Độ Khó ngay trong Phòng chờ -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-[#1c1917]">Chọn độ khó đề bài cho phòng này:</span>
+            <span id="lobbySelectedDiffText" class="text-xs font-bold text-[#2d6a4f]">Đang chọn: Dễ (40 số sẵn)</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2.5">
+            <button type="button" data-lobby-diff="EASY"
+              class="lobby-diff-btn py-2 px-3 border-2 border-[#292524] bg-[#292524] text-[#fffdf9] text-center transition">
+              <div class="text-sm font-bold">Dễ</div>
+              <div class="text-[10px] mono-num opacity-80">40 số sẵn (41 trống)</div>
+            </button>
+            <button type="button" data-lobby-diff="MEDIUM"
+              class="lobby-diff-btn py-2 px-3 border-2 border-[#292524] bg-[#fffdf9] text-[#1c1917] hover:bg-[#f3efe6] text-center transition">
+              <div class="text-sm font-bold">Trung bình</div>
+              <div class="text-[10px] mono-num opacity-80">30 số sẵn (51 trống)</div>
+            </button>
+            <button type="button" data-lobby-diff="HARD"
+              class="lobby-diff-btn py-2 px-3 border-2 border-[#292524] bg-[#fffdf9] text-[#1c1917] hover:bg-[#f3efe6] text-center transition">
+              <div class="text-sm font-bold">Khó</div>
+              <div class="text-[10px] mono-num opacity-80">25 số sẵn (56 trống)</div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Khung Chat Phòng chờ -->
+        <div class="p-2.5 bg-[#f5f2eb] border-2 border-[#292524] space-y-2">
+          <div class="flex items-center justify-between text-xs border-b border-[#d6d0c4] pb-1">
+            <span class="font-bold uppercase tracking-wider text-[#1c1917]">Trò chuyện trong phòng</span>
+            <span class="text-[10px] italic text-[#57534e]">Cuộn để xem tin nhắn cũ</span>
+          </div>
+
+          <div id="lobbyChatHistoryBox" class="h-24 overflow-y-auto bg-[#fffdf9] border border-[#d6d0c4] p-2 space-y-1 text-xs">
+            <div class="text-[#57534e] italic text-[11px]">Hệ thống: Phòng chờ đã mở. Hãy chọn độ khó và trò chuyện trước khi bắt đầu!</div>
+          </div>
+
+          <div class="flex flex-wrap gap-1.5">
+            <button type="button" data-quick-msg="Sẵn sàng chiến thôi!" class="lobby-quick-chat px-2 py-0.5 border border-[#292524] bg-[#fffdf9] hover:bg-[#e7e2d8] text-[11px] font-semibold">
+              "Sẵn sàng chiến thôi!"
+            </button>
+            <button type="button" data-quick-msg="Thử sức mức Khó nhé?" class="lobby-quick-chat px-2 py-0.5 border border-[#292524] bg-[#fffdf9] hover:bg-[#e7e2d8] text-[11px] font-semibold">
+              "Thử sức mức Khó nhé?"
+            </button>
+            <button type="button" data-quick-msg="Chờ tôi chút!" class="lobby-quick-chat px-2 py-0.5 border border-[#292524] bg-[#fffdf9] hover:bg-[#e7e2d8] text-[11px] font-semibold">
+              "Chờ tôi chút!"
+            </button>
+            <button type="button" data-quick-msg="Chúc may mắn nhé!" class="lobby-quick-chat px-2 py-0.5 border border-[#292524] bg-[#fffdf9] hover:bg-[#e7e2d8] text-[11px] font-semibold">
+              "Chúc may mắn nhé!"
+            </button>
+          </div>
+
+          <form id="lobbyCustomChatForm" class="flex items-stretch gap-1.5">
+            <input id="lobbyCustomChatInput" type="text" autocomplete="off" maxlength="100" placeholder="Nhập tin nhắn (Nhấn Enter để gửi)..."
+              class="flex-1 px-2.5 py-1 text-xs border border-[#292524] bg-[#fffdf9] focus:outline-none" />
+            <button type="submit" class="px-3.5 py-1 bg-[#292524] hover:bg-[#44403c] text-[#fffdf9] text-xs font-bold uppercase tracking-wider transition">
+              Gửi
+            </button>
+          </form>
+        </div>
+
+        <!-- Nút Sẵn sàng & Bắt đầu trận đấu -->
+        <div class="pt-0.5 flex flex-wrap items-center justify-between gap-3">
+          <button id="btnToggleLobbyReady" type="button"
+            class="px-4 py-2 border-2 border-[#292524] bg-[#fffdf9] hover:bg-[#f3efe6] text-xs font-bold uppercase tracking-wider transition">
+            Đổi trạng thái Sẵn sàng của bạn
+          </button>
+          <button id="btnStartMatchFromLobby" type="button"
+            class="px-7 py-2 border-2 border-[#292524] bg-[#2d6a4f] hover:bg-[#23533d] text-white text-sm font-bold uppercase tracking-wider transition shadow-sm">
+            Bắt đầu trận đấu ngay
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- MÀN HÌNH 3: BÀN ĐẤU 1V1 (KHÓA SCROLL, VỪA KHÍT MÀN HÌNH 100VH)      -->
+    <section id="viewArena" class="hidden w-full">
+      <div class="bg-[#fffdf9] border-2 border-[#292524] p-3 sm:p-4 shadow-sm flex flex-col justify-between gap-2.5 max-h-[calc(100vh-1.5rem)] overflow-hidden">
+
+        <!-- DÒNG 1: Thanh đo TIẾN ĐỘ HOÀN THÀNH 2 bên -->
+        <div class="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3 md:gap-5">
+
+          <!-- Bên trái: Người chơi -->
+          <div class="flex-1 min-w-0 space-y-1">
+            <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-[#1c1917] px-0.5">
+              <div class="flex items-center gap-1.5 truncate">
+                <span id="p1NameHeader" class="truncate">Bạn</span>
+                <span class="text-[#a8a29e]">•</span>
+                <span id="p1ScoreDisplay" class="mono-num text-xs sm:text-sm font-bold text-[#16a34a] shrink-0">0 đ</span>
+              </div>
+              <span id="p1ProgressDisplay" class="mono-num text-xs font-bold text-[#1c1917] shrink-0 ml-2">0% (0/41 ô)</span>
+            </div>
+            <div class="w-full h-3 bg-[#f3efe6] border border-[#292524] overflow-hidden p-0.5">
+              <div id="p1ScoreBar" class="h-full bg-[#2d6a4f] transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <div class="flex items-center justify-between text-[10px] sm:text-[11px] italic text-[#57534e] px-0.5">
+              <span>Tiến độ hoàn thành của bạn</span>
+              <span id="p1StateBadge" class="font-semibold text-[#2d6a4f]">Đang giải</span>
+            </div>
+          </div>
+
+          <!-- Khung Thời gian cố định ở chính giữa -->
+          <div class="shrink-0 flex flex-col items-center justify-center mx-auto md:mx-1 z-10">
+            <div class="border-2 border-[#292524] px-3.5 py-1 bg-[#fffdf9] text-center min-w-[124px] shadow-sm">
+              <div class="text-[9px] uppercase tracking-wider text-[#57534e] leading-none">Thời gian (15p)</div>
+              <div id="matchTimerDisplay" class="text-sm sm:text-base font-bold mono-num text-[#1c1917] my-0.5 leading-tight">00:00</div>
+              <div id="speedMultiplierBadge" class="text-[10px] font-bold text-[#b45309] mono-num leading-none">Hệ số x6</div>
+            </div>
+          </div>
+
+          <!-- Bên phải: Đối thủ -->
+          <div class="flex-1 min-w-0 space-y-1">
+            <div class="flex items-center justify-between text-xs sm:text-sm font-bold text-[#1c1917] px-0.5">
+              <span id="p2ProgressDisplay" class="mono-num text-xs font-bold text-[#1c1917] shrink-0 mr-2">0% (0/41 ô)</span>
+              <div class="flex items-center gap-1.5 truncate">
+                <span id="p2ScoreDisplay" class="mono-num text-xs sm:text-sm font-bold text-[#b91c1c] shrink-0">0 đ</span>
+                <span class="text-[#a8a29e]">•</span>
+                <span id="p2NameHeader" class="truncate">Bot AI</span>
+              </div>
+            </div>
+            <div class="w-full h-3 bg-[#f3efe6] border border-[#292524] overflow-hidden p-0.5 flex justify-end">
+              <div id="p2ScoreBar" class="h-full bg-[#b91c1c] transition-all duration-300" style="width: 0%"></div>
+            </div>
+            <div class="flex items-center justify-between text-[10px] sm:text-[11px] italic text-[#57534e] px-0.5">
+              <span id="p2StateBadge" class="font-semibold text-[#2b4c7e]">Đang giải</span>
+              <span>Tiến độ hoàn thành đối thủ</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- DÒNG 2: Nút điều khiển & Dòng note thưởng ELO nằm gọn trên 1 hàng (Không đẩy giao diện) -->
+        <div class="flex flex-wrap items-center justify-between gap-2 py-1.5 border-y border-[#e7e2d8]">
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="btnSurrender" type="button"
+              class="px-3.5 py-1 border-2 border-[#292524] bg-[#b91c1c] hover:bg-[#991b1b] text-white text-xs sm:text-sm font-bold tracking-wide transition">
+              Bỏ cuộc
+            </button>
+            <button id="btnLeaveSpectate" type="button"
+              class="hidden px-3.5 py-1 border-2 border-[#292524] bg-[#57534e] hover:bg-[#292524] text-white text-xs sm:text-sm font-bold tracking-wide transition">
+              Thoát ra ngoài
+            </button>
+            <button id="btnForceOpponentFinish" type="button"
+              class="hidden px-3.5 py-1 border-2 border-[#292524] bg-[#2d6a4f] hover:bg-[#23533d] text-white text-xs sm:text-sm font-bold tracking-wide transition">
+              Kết thúc ngay
+            </button>
+            <button id="btnToggleSpectateBoard" type="button"
+              class="hidden px-3 py-1 border-2 border-[#292524] bg-[#2b4c7e] hover:bg-[#203a61] text-white text-xs font-bold transition">
+              Xem lại bảng của bạn
+            </button>
+            <div class="text-xs sm:text-sm font-bold text-[#1c1917]">
+              Độ khó: <span id="activeDifficultyBadge" class="italic font-normal">Dễ</span>
+              <span class="ml-1 text-[11px] text-[#78716c] mono-num">[Phòng: <span id="activeRoomCodeBadge">S9K2</span>]</span>
+            </div>
+          </div>
+
+          <!-- Dòng note nhỏ gọn xuất hiện ngay khi 1 người chạm 5/5 lỗi -->
+          <div id="inlineLockNote" class="hidden text-[11px] sm:text-xs font-bold italic text-[#b45309]">
+            Hoàn thành toàn bộ bảng để nhận +50% ELO thưởng!
+          </div>
+
+          <div class="flex items-center gap-3.5">
+            <div class="text-xs sm:text-sm font-bold text-[#1c1917]">
+              Lỗi: <span id="p1MistakesDisplay" class="mono-num text-[#b91c1c]">0/5</span>
+            </div>
+            <div class="text-xs text-[#57534e]">
+              Lỗi đối thủ: <span id="p2MistakesDisplay" class="mono-num font-bold">0/5</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Giữ thẻ ẩn để tương thích hoàn toàn, không bao giờ bật lên làm lệch màn hình -->
+        <div id="waitingStatusBanner" class="hidden">
+          <h3 id="waitingBannerTitle"></h3>
+          <p id="waitingBannerDesc"></p>
+          <button id="btnLeaveFromBanner" type="button"></button>
+        </div>
+
+        <!-- KHU VỰC CHÍNH 3 CỘT NGANG -->
+        <div class="flex flex-col items-center justify-center gap-2.5">
+          <div class="w-full flex flex-row items-start justify-center gap-4 lg:gap-6">
+
+            <!-- CỘT TRÁI: 3 Nút Công Cụ -->
+            <div class="flex flex-col items-stretch gap-2.5 w-[130px] sm:w-[148px] shrink-0 pt-1">
+              <div class="text-xs font-bold text-[#1c1917] px-0.5">Công cụ hỗ trợ</div>
+
+              <button id="btnUndoMove" type="button"
+                class="w-full py-2.5 px-3 rounded-xl border-2 border-[#292524] bg-[#fffdf9] hover:bg-[#f3efe6] text-xs sm:text-sm font-bold text-[#1c1917] transition flex flex-col items-center gap-0.5 shadow-sm">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 7v6h6"></path>
+                  <path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"></path>
+                </svg>
+                <span>hoàn tác</span>
+                <span class="text-[10px] italic text-[#78716c]">Ctrl + Z</span>
+              </button>
+
+              <button id="btnDeleteWrongCell" type="button"
+                class="w-full py-2.5 px-3 rounded-xl border-2 border-[#292524] bg-[#fffdf9] hover:bg-[#fef2f2] text-xs sm:text-sm font-bold text-[#1c1917] transition flex flex-col items-center gap-0.5 shadow-sm">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"></path>
+                  <path d="M22 21H7"></path>
+                  <path d="m5 11 9 9"></path>
+                </svg>
+                <span>xóa</span>
+                <span class="text-[10px] italic text-[#b91c1c]">Del / Backspace</span>
+              </button>
+
+              <button id="btnToggleNotes" type="button"
+                class="w-full py-2.5 px-3 rounded-xl border-2 border-[#292524] bg-[#fffdf9] hover:bg-[#f3efe6] text-xs sm:text-sm font-bold text-[#1c1917] transition flex flex-col items-center gap-0.5 shadow-sm">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+                  <path d="m15 5 4 4"></path>
+                </svg>
+                <span>ghi chú: <span id="notesStatusLabel" class="font-normal italic">Tắt</span></span>
+                <span class="text-[10px] italic text-[#2b4c7e]">Phím N / Space</span>
+              </button>
+
+              <button id="btnClearFocusDigit" type="button"
+                class="mt-1 py-1.5 px-2 border border-[#d6d0c4] bg-[#f5f2eb] hover:bg-[#e7e2d8] text-[11px] italic text-[#57534e] hover:text-[#1c1917] rounded-lg transition text-center">
+                Bỏ chọn ô (Esc)
+              </button>
+            </div>
+
+            <!-- CỘT GIỮA: Bảng 9x9 chính + Dãy 9 phím số (1–9) -->
+            <div class="flex flex-col items-center gap-2.5">
+              <div class="flex justify-center">
+                <div id="playerBoard" class="sudoku-board-main" role="grid" aria-label="Bảng Sudoku của bạn"></div>
+              </div>
+              <div class="w-full sudoku-numpad-wrap">
+                <div id="numpadContainer" class="grid grid-cols-9 gap-1.5"></div>
+              </div>
+            </div>
+
+            <!-- CỘT PHẢI: Bảng 9x9 thu nhỏ của đối thủ -->
+            <div class="flex flex-col items-start space-y-1.5 w-[155px] sm:w-[165px] shrink-0 pt-1">
+              <div class="flex items-center justify-between w-full text-xs font-bold text-[#1c1917]">
+                <span>Đối thủ</span>
+                <span id="p2RevealNotice" class="text-[10px] italic font-normal text-[#57534e]">Ẩn số</span>
+              </div>
+              <div id="opponentBoard" class="sudoku-board-mini" role="grid" aria-label="Bảng thu nhỏ của đối thủ"></div>
+              <div id="lastMoveExplain" class="w-full text-[11px] italic text-[#57534e] leading-snug pt-0.5">
+                Nhấn vào 1 ô bất kỳ để highlight các ô cùng hàng, cột và khối 3×3.
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- CÁC MODAL POPUP: ĐĂNG NHẬP, CÔNG NGHỆ, LUẬT CHƠI, BXH, LỊCH SỬ, KẾT QUẢ -->
+  <!-- MODAL 1: ĐĂNG NHẬP / ĐĂNG KÝ -->
+  <div id="authModal" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+    <div class="bg-[#fffdf9] border-2 border-[#292524] max-w-sm w-full p-5 space-y-4 shadow-lg">
+      <div class="flex items-center justify-between border-b border-[#d6d0c4] pb-2">
+        <h3 id="authModalTitle" class="text-lg font-bold text-[#1c1917]">Đăng Nhập Tài Khoản</h3>
+        <button id="btnCloseAuthModal" type="button" class="text-xs font-bold text-[#57534e]">✕ Đóng</button>
+      </div>
+
+      <div class="grid grid-cols-2 border border-[#292524] bg-[#f5f2eb]">
+        <button id="tabSelectLogin" type="button" class="py-1.5 text-xs font-bold bg-[#292524] text-[#fffdf9]">Đăng nhập</button>
+        <button id="tabSelectRegister" type="button" class="py-1.5 text-xs font-bold text-[#1c1917]">Đăng ký</button>
+      </div>
+
+      <form id="authSwitchForm" class="space-y-3 text-xs">
+        <div>
+          <label class="block font-bold mb-1">Tên tài khoản (Username):</label>
+          <input id="authUsernameInput" type="text" autocomplete="off" required placeholder="Nhập tên tài khoản..."
+            class="w-full px-3 py-2 border border-[#292524] bg-white font-bold mono-num" />
+        </div>
+        <div>
+          <label class="block font-bold mb-1">Mật khẩu:</label>
+          <input id="authPasswordInput" type="password" autocomplete="new-password" required placeholder="Nhập mật khẩu..."
+            class="w-full px-3 py-2 border border-[#292524] bg-white mono-num" />
+        </div>
+        <button id="btnAuthSubmit" type="submit" class="w-full py-2.5 bg-[#292524] text-[#fffdf9] font-bold uppercase tracking-wider">
+          Đăng nhập ngay
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: THÔNG TIN CÔNG NGHỆ -->
+  <div id="techInfoModal" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+    <div class="bg-[#fffdf9] border-2 border-[#292524] max-w-lg w-full p-5 space-y-3 shadow-lg text-xs">
+      <div class="flex items-center justify-between border-b border-[#d6d0c4] pb-2">
+        <h3 class="text-base font-bold">Thông Tin Kiến Trúc &amp; Giao Thức Mạng</h3>
+        <button id="btnCloseTechInfoModal" type="button" class="font-bold">✕ Đóng</button>
+      </div>
+      <div class="space-y-2 leading-relaxed">
+        <p>• <b>Kiến trúc:</b> Client – Server tách biệt hoàn toàn (`frontend/` &amp; `backend/`).</p>
+        <p>• <b>Giao thức 1 (RESTful API — HTTP):</b> Xử lý Đăng nhập, Đăng ký (`bcrypt`), lấy đề ngẫu nhiên, Bảng xếp hạng ELO và Lịch sử đấu.</p>
+        <p>• <b>Giao thức 2 (WebSocket / Socket.IO trên nền TCP):</b> Quản lý Phòng chờ, Chat trực tiếp, đồng bộ tiến độ điền ô thời gian thực (ẩn con số của đối thủ để chống lộ đề) và phân định kết quả tức thì.</p>
+        <p>• <b>Cơ sở dữ liệu:</b> Microsoft SQL Server (`SudokuelDB` gồm 3 bảng `Users`, `Puzzles`, `Matches`).</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 3: LUẬT CHƠI CƠ BẢN & HỆ THỐNG PHÍM TẮT -->
+  <div id="rulesModal" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+    <div class="bg-[#fffdf9] border-2 border-[#292524] max-w-lg w-full p-5 space-y-3 shadow-lg text-xs">
+      <div class="flex items-center justify-between border-b border-[#d6d0c4] pb-2">
+        <h3 class="text-base font-bold">Luật Chơi Cơ Bản &amp; Hệ Thống Phím Tắt</h3>
+        <button id="btnCloseRulesModal" type="button" class="font-bold">✕ Đóng</button>
+      </div>
+      <div class="space-y-1.5 leading-relaxed">
+        <p>• <b>Điểm số tự nhiên:</b> Mỗi ô điền đúng cộng cố định <b>+10đ</b>. Hoàn thành mỗi Hàng / Cột / Khối 3×3 cộng thêm <b>+30đ</b>.</p>
+        <p>• <b>Về đích &amp; Chiến thắng:</b> Người giải xong toàn bộ 81 ô trước sẽ <b>kết thúc ván đấu ngay lập tức</b>, giành chiến thắng tuyệt đối và nhận thưởng tốc độ <b>+100đ × Hệ số thời gian (x6 → x1)</b>.</p>
+        <p>• <b>Giới hạn lỗi &amp; Thời gian:</b> Điền sai không bị trừ điểm nhưng tính 1 lỗi. Đạt <b>5/5 lỗi</b> sẽ bị khóa bảng. Thời gian tối đa mỗi trận là <b>15 phút</b>.</p>
+        <p>• <b>Tính điểm ELO:</b> Tính theo chuẩn Quốc tế (K = 24); thắng bằng cách giải hoàn tất toàn bộ 81 ô được thưởng thêm <b>+50% ELO</b>.</p>
+      </div>
+
+      <div class="p-3 bg-[#f5f2eb] border border-[#292524] space-y-1">
+        <div class="font-bold uppercase tracking-wider text-[#1c1917] pb-0.5">⌨ Hệ thống Phím tắt trong trận đấu:</div>
+        <div>• <b>Phím 1–9 / Numpad 1–9:</b> Điền số hoặc ghi chú nháp vào ô đang chọn</div>
+        <div>• <b>Phím N hoặc Phím cách (Space):</b> Bật / Tắt nhanh chế độ Ghi chú nháp</div>
+        <div>• <b>Phím Del hoặc Backspace:</b> Xóa số điền sai (màu đỏ) hoặc xóa ghi chú trong ô</div>
+        <div>• <b>Tổ hợp phím Ctrl + Z:</b> Hoàn tác nước đi vừa thực hiện</div>
+        <div>• <b>Phím mũi tên (↑ ↓ ← →) / Esc:</b> Di chuyển ô đang chọn / Bỏ chọn ô</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 4: BẢNG XẾP HẠNG ELO -->
+  <div id="leaderboardModal" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+    <div class="bg-[#fffdf9] border-2 border-[#292524] max-w-md w-full p-5 space-y-3 shadow-lg text-xs">
+      <div class="flex items-center justify-between border-b border-[#d6d0c4] pb-2">
+        <h3 class="text-base font-bold">Bảng Xếp Hạng Cao Thủ (Top 10 ELO)</h3>
+        <button id="btnCloseLeaderboardModal" type="button" class="font-bold">✕ Đóng</button>
+      </div>
+      <table class="w-full border-collapse table-fixed">
+        <thead>
+          <tr class="border-b border-[#292524] bg-[#f5f2eb]">
+            <th class="w-14 py-2 px-2 text-center">Hạng</th>
+            <th class="py-2 px-2 text-left">Kỳ thủ</th>
+            <th class="w-20 py-2 px-2 text-center">ELO</th>
+            <th class="w-32 py-2 px-2 text-right">Tỉ lệ thắng (Trận)</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboardTableBody" class="divide-y divide-[#e7e2d8]"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MODAL 5: LỊCH SỬ TRẬN ĐẤU -->
+  <div id="historyModal" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+    <div class="bg-[#fffdf9] border-2 border-[#292524] max-w-lg w-full p-5 space-y-3 shadow-lg text-xs">
+      <div class="flex items-center justify-between border-b border-[#d6d0c4] pb-2">
+        <h3 class="text-base font-bold">Lịch Sử Trận Đấu Gần Đây</h3>
+        <button id="btnCloseHistoryModal" type="button" class="font-bold">✕ Đóng</button>
+      </div>
+      <div id="matchHistoryContainer" class="space-y-2 max-h-72 overflow-y-auto pr-1"></div>
+    </div>
+  </div>
+
+  <!-- MODAL 6: GHÉP CẶP NHANH -->
+  <div id="lobbyModal" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+    <div class="bg-[#fffdf9] border-2 border-[#292524] max-w-sm w-full p-5 space-y-3.5 shadow-lg text-center">
+      <div class="text-[11px] font-bold uppercase tracking-widest text-[#2d6a4f]">
+        Hàng Đợi Xếp Hạng ELO (1v1)
+      </div>
+      <h3 class="text-base font-bold text-[#1c1917]">Đang tìm đối thủ tương đồng...</h3>
+      <div id="quickMatchTimerText" class="text-2xl font-bold mono-num text-[#b45309]">00:00</div>
+      <div id="quickMatchRangeText" class="text-xs font-semibold text-[#2b4c7e] bg-[#f5f2eb] border border-[#d6d0c4] py-1.5 px-2">
+        Đang dò tìm kỳ thủ có mức ELO tương đương...
+      </div>
+      <p class="text-[11px] italic text-[#57534e]">
+        Hệ thống tự động ưu tiên ghép cặp kỳ thủ có chênh lệch ELO thấp nhất và chọn ngẫu nhiên đề bài từ CSDL.
+      </p>
+      <div id="homeOpenRoomsList" class="hidden"></div>
+      <button id="btnCloseLobbyModal" type="button"
+        class="w-full py-2 border-2 border-[#b91c1c] text-[#b91c1c] hover:bg-[#b91c1c] hover:text-white text-xs font-bold uppercase tracking-wider transition">
+        ✕ Hủy tìm trận
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL 8: XÁC NHẬN BỎ CUỘC -->
+  <div id="surrenderConfirmModal" class="hidden fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+    <div class="bg-[#fffdf9] border-2 border-[#292524] max-w-sm w-full p-5 space-y-4 shadow-lg text-center">
+      <h3 class="text-lg font-bold text-[#b91c1c]">Xác Nhận Bỏ Cuộc?</h3>
+      <p id="surrenderConfirmText" class="text-xs italic text-[#57534e]">Nếu bỏ cuộc ngay bây giờ, bạn sẽ bị xử thua ván đấu này và bị trừ điểm ELO.</p>
+      <div class="flex items-center justify-center gap-3">
+        <button id="btnCancelSurrenderModal" type="button" class="px-4 py-2 border border-[#292524] bg-[#f5f2eb] text-xs font-bold">Tiếp tục giải</button>
+        <button id="btnConfirmSurrenderNow" type="button" class="px-4 py-2 border border-[#292524] bg-[#b91c1c] text-white text-xs font-bold">Bỏ cuộc ngay</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 9: MÀN HÌNH KẾT QUẢ DẠNG LANDSCAPE NGANG -->
+  <div id="matchResultModal" class="hidden fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-3 overflow-hidden">
+    <div class="bg-[#fffdf9] border-2 border-[#292524] w-full max-w-lg p-5 shadow-xl space-y-4">
+      <div class="border-b border-[#d6d0c4] pb-2 text-center">
+        <span id="modalPriorityBadge" class="inline-block px-2.5 py-0.5 bg-[#292524] text-[#fffdf9] text-[10px] font-bold uppercase tracking-wider">
+          KẾT QUẢ TRẬN ĐẤU
+        </span>
+        <h2 id="modalWinnerHeadline" class="text-xl sm:text-2xl font-bold text-[#1c1917] mt-1">
+          BẠN CHIẾN THẮNG!
+        </h2>
+        <p id="modalWinnerSubtext" class="text-xs italic text-[#57534e] mt-0.5"></p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <!-- P1 -->
+        <div class="p-3 border border-[#292524] bg-[#f5f2eb] space-y-1.5 text-xs">
+          <div class="flex items-center justify-between">
+            <span id="modalP1Name" class="font-bold truncate">Bạn</span>
+            <span id="modalP1StatusTag" class="px-1.5 py-0.5 text-[10px] font-bold bg-[#2d6a4f] text-white">THẮNG</span>
+          </div>
+          <div class="text-lg font-bold mono-num text-[#16a34a]" id="modalP1Score">0 đ</div>
+          <div id="modalP1BonusNote" class="text-[10px] italic text-[#57534e]"></div>
+          <div class="text-[11px] flex justify-between"><span>Thời gian:</span><b id="modalP1Time" class="mono-num">00:00:00</b></div>
+          <div class="text-[11px] flex justify-between"><span>Tiến độ:</span><b id="modalP1Cells" class="mono-num">0%</b></div>
+          <div class="text-[11px] flex justify-between"><span>Số lỗi:</span><b id="modalP1Mistakes" class="mono-num text-[#b91c1c]">0 / 5</b></div>
+        </div>
+
+        <!-- P2 -->
+        <div class="p-3 border border-[#292524] bg-[#f5f2eb] space-y-1.5 text-xs">
+          <div class="flex items-center justify-between">
+            <span id="modalP2Name" class="font-bold truncate">Đối thủ</span>
+            <span id="modalP2StatusTag" class="px-1.5 py-0.5 text-[10px] font-bold bg-[#d6d0c4] text-[#1c1917]">THUA</span>
+          </div>
+          <div class="text-lg font-bold mono-num text-[#2b4c7e]" id="modalP2Score">0 đ</div>
+          <div id="modalP2BonusNote" class="text-[10px] italic text-[#57534e]"></div>
+          <div class="text-[11px] flex justify-between"><span>Thời gian:</span><b id="modalP2Time" class="mono-num">00:00:00</b></div>
+          <div class="text-[11px] flex justify-between"><span>Tiến độ:</span><b id="modalP2Cells" class="mono-num">0%</b></div>
+          <div class="text-[11px] flex justify-between"><span>Số lỗi:</span><b id="modalP2Mistakes" class="mono-num text-[#b91c1c]">0 / 5</b></div>
+        </div>
+      </div>
+
+      <!-- Giữ các ID ẩn để không báo lỗi null trong JS -->
+      <div class="hidden">
+        <div id="postMatchBoardDesc"></div>
+        <div id="postMatchFullBoard"></div>
+        <b id="pmCountGiven">0</b>
+        <b id="pmCountGuessed">0</b>
+        <b id="pmCountUnrevealed">0</b>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-center gap-2.5 pt-1">
+        <button id="btnBackHomeFromModal" type="button"
+          class="px-5 py-2 border-2 border-[#292524] bg-[#f5f2eb] hover:bg-[#e7e2d8] text-xs font-bold transition">
+          Về Trang Chủ
+        </button>
+        <button id="btnBackToRoomLobbyModal" type="button"
+          class="hidden px-5 py-2 border-2 border-[#292524] bg-[#2b4c7e] hover:bg-[#203a61] text-white text-xs font-bold transition">
+          Trở Về Phòng Chờ
+        </button>
+        <button id="btnPlayAgainModal" type="button"
+          class="hidden px-5 py-2 border-2 border-[#292524] bg-[#2d6a4f] hover:bg-[#23533d] text-white text-xs font-bold transition">
+          Đấu Lại (Cùng Độ Khó)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- NẠP 8 MODULE JS THEO THỨ TỰ PHỤ THUỘC -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="./js/config.js"></script>
+  <script src="./js/utils.js"></script>
+  <script src="./js/data.js"></script>
+  <script src="./js/auth.js"></script>
+  <script src="./js/game.js"></script>
+  <script src="./js/verdict.js"></script>
+  <script src="./js/render.js"></script>
+  <script src="./js/events.js"></script>
+</body>
+</html>
