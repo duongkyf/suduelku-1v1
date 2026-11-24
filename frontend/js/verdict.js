@@ -24,6 +24,7 @@ function getValidCandidatesOnGrid(grid, idx) {
   return cands;
 }
 
+//Tìm vùng có ít ô trống nhất
 function getMinBlanksInPeers(grid, idx) {
   const r = Math.floor(idx / 9), c = idx % 9;
   const br = Math.floor(r / 3) * 3, bc = Math.floor(c / 3) * 3;
@@ -41,6 +42,8 @@ function getMinBlanksInPeers(grid, idx) {
   return Math.min(rBlanks, cBlanks, bBlanks);
 }
 
+
+//Thuật toán MRV + Backtracking
 function botSolveFromCurrentGrid(cleanGrid) {
   const g = cleanGrid.slice();
 
@@ -135,7 +138,7 @@ function findAlgorithmicBotMove(p2) {
     return topHidden[Math.floor(Math.random() * topHidden.length)];
   }
 
-  // TẦNG 3: MRV + BACKTRACKING 
+  // TẦNG 3: MRV + BACKTRACKING (Thực thi)
   unsolved.sort((a, b) => a.cands.length - b.cands.length || a.minRegionBlanks - b.minRegionBlanks);
   const minCandLen = unsolved[0].cands.length;
   const mrvPool = unsolved.filter(item => item.cands.length === minCandLen);
@@ -159,8 +162,9 @@ function simulateOpponentMove(isCorrect = true) {
   if (matchState.status !== 'PLAYING') return;
   const p2 = matchState.p2;
   if (p2.locked || p2.finished) return;
-  if (!p2.wrongMask) p2.wrongMask = Array(81).fill(false);
+  if (!p2.wrongMask) p2.wrongMask = Array(81).fill(false); //wrongMask: mảng chứa các ô bot điền sai
 
+  //Xóa dữ liệu điền sai
   clearTimeout(matchState.botClearWrongTimer);
   for (let i = 0; i < 81; i++) {
     if (p2.wrongMask[i]) {
@@ -179,6 +183,7 @@ function simulateOpponentMove(isCorrect = true) {
   let correctDigit = move.digit;
   let targetCands = move.cands;
 
+  //Chọn ô để mắc lỗi
   if (!isCorrect && move.minRegionBlanks <= 1 && move.allUnsolved) {
     const ambiguousCells = move.allUnsolved.filter(u => u.cands.length >= 2);
     if (ambiguousCells.length > 0) {
@@ -197,7 +202,7 @@ function simulateOpponentMove(isCorrect = true) {
     p2.currentGrid[targetIdx] = correctDigit;
     p2.correctCells += 1;
 
-    const baseGain = 10;
+    const baseGain = 10;//1 ô đúng 10 điểm
     let comboCount = 0;
     const r = Math.floor(targetIdx / 9), c = targetIdx % 9;
     const b = Math.floor(r / 3) * 3 + Math.floor(c / 3);
@@ -206,7 +211,7 @@ function simulateOpponentMove(isCorrect = true) {
     if (!p2.completedCols[c] && isColSolved(p2.cellState, c)) { p2.completedCols[c] = true; comboCount++; }
     if (!p2.completedBoxes[b] && isBoxSolved(p2.cellState, b)) { p2.completedBoxes[b] = true; comboCount++; }
 
-    const comboBonus = comboCount * 30;
+    const comboBonus = comboCount * 30;// 1 vùng đúng 30 điểm
     let fullClearBonus = 0;
     if (p2.cellState.every(s => s === 1)) {
       fullClearBonus = 100 * mult;
@@ -445,7 +450,7 @@ function checkAndTriggerMatchFinish() {
 
   const verdict = evaluateWinnerPriority(p1, p2);
 
-  // Client không tự tính ELO nữa: chỉ BÁO kết quả cho server, server tính và gửi lại (match_result)
+  // Client không tự tính ELO: chỉ BÁO kết quả cho server, server tính và gửi lại (match_result)
   const isRankedMatch = matchState.mode === 'QUICK_1V1';
   matchState.verdictReason = verdict.reason;
   if (dbState.isLoggedIn && matchState.mode !== 'BOT_AI') {
@@ -464,10 +469,10 @@ function checkAndTriggerMatchFinish() {
   updateAuthUI();
 
   const eloSuffix = !dbState.isLoggedIn || matchState.mode === 'BOT_AI'
-    ? ' (Luyện tập với máy • Không tính ELO)'
+    ? ' (Luyện tập với máy - Không tính ELO)'
     : isRankedMatch
     ? ' (Đang chờ máy chủ tính ELO...)'
-    : ' (Giao hữu Phòng tùy chọn • Không tính ELO)';
+    : ' (Giao hữu Phòng tùy chọn - Không tính ELO)';
 
   document.getElementById('modalPriorityBadge').textContent = verdict.badge;
   document.getElementById('modalWinnerHeadline').textContent =
@@ -600,13 +605,13 @@ if (typeof socket !== 'undefined' && socket) {
     let suffix;
     if (!saved) {
       suffix = reason === 'MISMATCH'
-        ? ' (Hai máy báo kết quả khác nhau • Ván này không tính ELO)'
-        : ' (Máy chủ chưa lưu được kết quả • Không tính ELO)';
+        ? ' (Hai máy báo kết quả khác nhau - Ván này không tính ELO)'
+        : ' (Máy chủ chưa lưu được kết quả - Không tính ELO)';
     } else if (!ranked) {
-      suffix = matchState.mode === 'ROOM_1V1' ? ' (Giao hữu Phòng tùy chọn • Không tính ELO)' : ' (Không tính ELO)';
+      suffix = matchState.mode === 'ROOM_1V1' ? ' (Giao hữu Phòng tùy chọn - Không tính ELO)' : ' (Không tính ELO)';
     } else {
       const d = deltas?.[me] ?? 0;
-      suffix = ` (${d >= 0 ? '+' : ''}${d} ELO${d > 0 && bonus > 0 ? ` • Gồm +${bonus} ELO thưởng giải hết bảng` : ''})`;
+      suffix = ` (${d >= 0 ? '+' : ''}${d} ELO${d > 0 && bonus > 0 ? ` - Gồm +${bonus} ELO thưởng giải hết bảng` : ''})`;
       if (elo?.[me] != null) {
         dbState.currentUser.elo = elo[me];
         sessionStorage.setItem('suduelku_user', JSON.stringify(dbState.currentUser));

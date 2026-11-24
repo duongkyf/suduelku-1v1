@@ -174,8 +174,8 @@ const onSafe = (socket, event, fn) =>
 const activeRooms = new Map();
 let quickMatchQueue = [];
 
-// 3a. KẾT QUẢ TRẬN: SERVER TỰ TÍNH ELO & LƯU LỊCH SỬ (không tin số ELO từ client)
-//   - Client chỉ BÁO "ai thắng" qua socket; ELO do server đọc từ DB và tính.
+// 3a. KẾT QUẢ TRẬN: SERVER TỰ TÍNH ELO & LƯU LỊCH SỬ
+//   - Client BÁO "ai thắng" qua socket; ELO do server đọc từ DB và tính.
 //   - Hai bên báo khớp nhau -> chốt. Báo khác nhau -> không tính ELO.
 //   - Thoát / rớt mạng giữa ván khi cả hai còn đang chơi -> bên thoát bị xử thua.
 const DIFFS = ['EASY', 'MEDIUM', 'HARD'];
@@ -198,13 +198,13 @@ function startMatchRecord(room) {
   if (room.match) clearTimeout(room.match.timer);
   const m = {
     roomCode: room.roomCode,
-    ranked: Boolean(room.isQuickMatch), // do SERVER quyết định (phòng ghép cặp), không tin client
+    ranked: Boolean(room.isQuickMatch), // do SERVER quyết định, không tin client
     difficulty: DIFFS.includes(room.difficulty) ? room.difficulty : 'EASY',
     players: [
       { name: room.host, socketId: room.hostSocketId },
       { name: room.guest, socketId: room.guestSocketId }
     ],
-    stats: {},    // socketId -> { score, correctCells, mistakes } (lấy từ player_move gần nhất)
+    stats: {},    // socketId -> { score, correctCells, mistakes }
     reports: {},  // socketId -> báo cáo kết quả
     left: {},     // socketId -> true nếu đã rời phòng
     finished: false

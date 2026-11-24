@@ -70,7 +70,7 @@ function sdkCountSolutions(cells, limit = 2) {
 
   function solve() {
     if (count >= limit) return;
-    // Chọn ô trống có ít ứng viên nhất để cắt nhánh nhanh
+    // Chọn ô trống có ít ứng viên nhất để cắt nhánh nhanh (MRV)
     let bestIdx = -1, bestCands = null;
     for (let i = 0; i < 81; i++) {
       if (g[i] === 0) {

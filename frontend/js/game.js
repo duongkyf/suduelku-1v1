@@ -1,13 +1,13 @@
 // game.js — LOGIC TRẬN ĐẤU, PHÒNG CHỜ, ĐIỀN SỐ, XÓA, HOÀN TÁC
 
 //TIỆN ÍCH CHUNG
-
 //Hệ số điểm
 function getSpeedMultiplier(ms) {
   const sec = Math.floor(ms / 1000);
   return sec <= 60 ? 6 : sec <= 120 ? 5 : sec <= 180 ? 4 : sec <= 240 ? 3 : sec <= 300 ? 2 : 1;
 }
 
+//Kiểm tra 1 vùng đã kín chưa
 const isRowSolved = (cs, r) => Array.from({ length: 9 }, (_, c) => cs[r * 9 + c]).every(s => s === 1);
 const isColSolved = (cs, c) => Array.from({ length: 9 }, (_, r) => cs[r * 9 + c]).every(s => s === 1);
 const isBoxSolved = (cs, b) => {
@@ -196,6 +196,7 @@ async function startNewMatch({ difficulty = matchState.difficulty, mode = 'BOT_A
   const digits = puzzle.initialGrid.split('').map(c => parseInt(c, 10));
   const firstBlank = puzzle.initialGrid.indexOf('0');
 
+  //Reset bộ nhớ khi bắt đầu ván mới để ko còn dữ liệu từ ván cũ ảnh hưởng
   Object.assign(matchState, {
     roomCode: code, mode, difficulty,
     totalBlanks: puzzle.blanksCount,
@@ -211,6 +212,7 @@ async function startNewMatch({ difficulty = matchState.difficulty, mode = 'BOT_A
     moveHistory: []
   });
 
+  //Khởi tạo 2 players
   matchState.p1 = makePlayer(dbState.isLoggedIn ? dbState.currentUser.username : 'Bạn (Khách)', digits, {
     givenMask: digits.map(d => d !== 0),
     wrongMask: Array(81).fill(false),
@@ -255,6 +257,7 @@ async function startNewMatch({ difficulty = matchState.difficulty, mode = 'BOT_A
   switchScreen('ARENA');
   renderAllArena();
 
+  //Đồng hồ thời gian ván đấu
   matchState.timerInterval = setInterval(() => {
     if (matchState.status !== 'PLAYING') return;
     matchState.elapsedMs = performance.now() - matchState.startedAtMs;
@@ -305,6 +308,7 @@ function setupOpponentBotLoop() {
     return Math.round(base);
   }
 
+  //Random ra số < tỉ lệ lỗi thì điền sai
   function scheduleNext() {
     if (!active()) return;
     const delay = computeHumanLikeDelay();
@@ -324,7 +328,7 @@ function updateTimerAndMultiplierUI() {
   document.getElementById('speedMultiplierBadge').textContent = `Hệ số x${getSpeedMultiplier(matchState.elapsedMs)}`;
 }
 
-// ĐIỀN SỐ, XÓA, HOÀN TÁC 
+// ĐỒNG BỘ ĐIỀN SỐ, XÓA, HOÀN TÁC 
 function emitMove(idx, digit, isCorrect) {
   if (matchState.mode === 'BOT_AI') return;
   const { p1 } = matchState;
@@ -335,6 +339,7 @@ function emitMove(idx, digit, isCorrect) {
 }
 
 function handlePlayerSubmitDigit(digit) {
+  // Kiểm tra điều kiện hợp lệ của ô chọn và lưu bản sao trạng thái cũ để phục vụ Hoàn tác
   const p1 = matchState.p1;
   if (matchState.status !== 'PLAYING') { renderAllArena(); return; }
   if (p1.locked || p1.finished) { renderAllArena(); return; }
