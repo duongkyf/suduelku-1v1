@@ -511,6 +511,10 @@ io.on('connection', (socket) => {
     if (roomCode && socket.rooms.has(roomCode)) socket.to(roomCode).emit('opponent_surrendered', { username });
   });
 
+  onSafe(socket, 'player_finish_early', ({ roomCode, username }) => {
+    if (roomCode && socket.rooms.has(roomCode)) socket.to(roomCode).emit('opponent_finished_early', { username });
+  });
+
   // Client BÁO kết quả cuối trận (chỉ báo "ai thắng", không gửi ELO)
   onSafe(socket, 'report_result', ({ roomCode, winnerName, endType, endActor, winnerSolved }) => {
     const m = activeRooms.get(roomCode)?.match;

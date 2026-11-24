@@ -590,11 +590,13 @@ if (typeof socket !== 'undefined' && socket) {
 
   socket.on('opponent_surrendered', () => {
     if (matchState.status !== 'PLAYING' || matchState.mode === 'BOT_AI') return;
-    if (!matchState.p1.finished) {
-      matchState.p2.surrendered = true;
-    }
-    matchState.p2.locked = true;
-    matchState.p2.finished = true;
+    Object.assign(matchState.p2, { surrendered: true, locked: true, finished: true });
+    checkMatchEndConditions();
+  });
+
+  socket.on('opponent_finished_early', () => {
+    if (matchState.status !== 'PLAYING' || matchState.mode === 'BOT_AI') return;
+    Object.assign(matchState.p2, { locked: true, finished: true });   // không đặt surrendered
     checkMatchEndConditions();
   });
 

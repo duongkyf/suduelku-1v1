@@ -445,7 +445,7 @@ function handleDeleteWrongOrNotesCell() {
 
   const idx = matchState.selectedCell;
   if (idx < 0 || idx >= 81) { showToast('Hãy chọn ô màu đỏ điền sai cần xóa!', 'info'); return; }
-  if (p1.givenMask[idx] || p1.cellState[idx] === 1) { showToast('Ô cho sẵn hoặc đã giải đúng (Anti-Farming) không thể xóa!', 'warn'); return; }
+  if (p1.givenMask[idx] || p1.cellState[idx] === 1) { showToast('Ô cho sẵn hoặc đã giải đúng không thể xóa!', 'warn'); return; }
   if (!p1.wrongMask[idx] && p1.notes[idx].size === 0 && p1.currentGrid[idx] === 0) { showToast('Ô đang chọn đã trống sẵn!', 'info'); return; }
 
   matchState.moveHistory.push({

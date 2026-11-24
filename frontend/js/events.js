@@ -426,11 +426,7 @@ window.addEventListener('DOMContentLoaded', () => {
   on('btnConfirmSurrenderNow', () => {
     hide('surrenderConfirmModal');
     // Nếu đối thủ đã khóa bảng 5/5 lỗi từ trước, việc dừng lại sẽ tính là chốt điểm để so điểm
-    if (matchState.p2.finished) {
-      Object.assign(matchState.p1, { locked: true, finished: true });
-    } else {
-      Object.assign(matchState.p1, { surrendered: true, locked: true, finished: true });
-    }
+    Object.assign(matchState.p1, { surrendered: true, locked: true, finished: true });
     if (matchState.mode !== 'BOT_AI') emit('player_surrender', { roomCode: matchState.roomCode, username: myName() });
     checkMatchEndConditions();
   });
@@ -446,7 +442,7 @@ window.addEventListener('DOMContentLoaded', () => {
       p1.locked = true;
       p1.finished = true;
       if (matchState.mode !== 'BOT_AI') {
-        emit('player_surrender', { roomCode: matchState.roomCode, username: myName() });
+        emit('player_finish_early', { roomCode: matchState.roomCode, username: myName() });
       }
       checkMatchEndConditions();
       return;
